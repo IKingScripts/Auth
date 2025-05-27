@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verificação Bem-Sucedida</title>
+  <style>
+    /* Reset básico e fonte */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Fundo desfocado */
+    .background {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url('https://media.discordapp.net/attachments/1328003685430591569/1346597724711026748/banner_Flash.jpg?ex=6836d99c&is=6835881c&hm=14dfe5c0953b0129de41c15dc7089343b880955e28b6760f94972de753a855fa&=&format=webp&width=1639&height=864');
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px); /* desfoca o fundo */
+      z-index: 0; /* fica atrás do conteúdo */
+      pointer-events: none; /* clique passa por ele */
+    }
+
+    /* Corpo da página */
+    body {
+      min-height: 100vh;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      flex-direction: column;
+      position: relative;
+      z-index: 1; /* conteúdo fica na frente do fundo */
+      background: transparent;
+    }
+
+    /* Caixa principal */
+    .container {
+      background: rgba(255, 255, 255, 0.1); /* leve fundo transparente */
+      backdrop-filter: blur(10px); /* vidro fosco na caixa */
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+      position: relative;
+      transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+    }
+
+    .hidden {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .server-icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      margin-bottom: 15px;
+      object-fit: cover;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 10px;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #00ffcc, #00ff88);
+      transition: width 0.5s ease-in-out;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.3s ease-in-out;
+      cursor: pointer;
+      border: none;
+      font-size: 16px;
+      margin-top: 15px;
+      opacity: 0; /* começa escondido */
+    }
+
+    .button.show {
+      opacity: 1; /* aparece quando pronto */
+    }
+
+    .button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #bdbdbd;
+      font-size: 14px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .discord-link a {
+  font-size: 23px;       /* maior um pouco */
+  font-weight: bold;
+  color: black;          /* texto preto */
+  background: none;      /* tira o gradiente colorido */
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  animation: none;       /* para piscar */
+}
+
+
+    @keyframes piscar {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="background"></div> <!-- Fundo desfocado -->
+
+  <div class="container hidden" id="verificationContainer">
+    <img id="discordImage" class="server-icon" src="https://media.discordapp.net/attachments/1328003685430591569/1346597723830227105/Logo_Flash_store.png?ex=6836d99b&is=6835881b&hm=b9a505433b7c25363940064acbcbbc134fc4c19256acd3074eae816ef9e2e2a0&=&format=webp&quality=lossless&width=864&height=864" alt="Imagem do Discord" />
+    <h2 id="statusText">Verificando...</h2>
+    <p id="progressText">0%</p>
+    <div class="progress-bar" id="progressContainer">
+      <div class="progress" id="progressBar"></div>
+    </div>
+    <button class="button" id="discordButton" onclick="window.location.href='https://discord.gg/flashstore'">Volte ao Discord</button>
+  </div>
+
+  <footer>
+    <div class="discord-link">
+      <a href="" target="_blank">by @antiregras</a>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const container = document.getElementById("verificationContainer");
+      const progressBar = document.getElementById("progressBar");
+      const progressText = document.getElementById("progressText");
+      const progressContainer = document.getElementById("progressContainer");
+      const statusText = document.getElementById("statusText");
+      const discordButton = document.getElementById("discordButton");
+
+      let progress = 0;
+
+      setTimeout(() => {
+        container.classList.remove("hidden");
+      }, 300);
+
+      const interval = setInterval(() => {
+        progress += 2;
+        progressBar.style.width = progress + "%";
+        progressText.textContent = progress + "%";
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            progressText.style.display = "none";
+            progressContainer.style.display = "none";
+            statusText.textContent = "Verificação Sucedida!";
+            discordButton.classList.add("show");
+          }, 500);
+        }
+      }, 50);
+    });
+  </script>
+
+</body>
+</html>
