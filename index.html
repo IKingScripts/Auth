@@ -1,194 +1,272 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Verificação Bem-Sucedida</title>
+  <title>Verificação Concluída</title>
   <style>
-    /* Reset básico e fonte */
-    * {
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #171717;
+      color: white;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-
-    /* Fundo desfocado */
-    .background {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url('https://media.discordapp.net/attachments/1328003685430591569/1346597724711026748/banner_Flash.jpg?ex=6836d99c&is=6835881c&hm=14dfe5c0953b0129de41c15dc7089343b880955e28b6760f94972de753a855fa&=&format=webp&width=1639&height=864');
-      background-size: cover;
-      background-position: center;
-      filter: blur(8px); /* desfoca o fundo */
-      z-index: 0; /* fica atrás do conteúdo */
-      pointer-events: none; /* clique passa por ele */
-    }
-
-    /* Corpo da página */
-    body {
       min-height: 100vh;
-      color: white;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
-      flex-direction: column;
-      position: relative;
-      z-index: 1; /* conteúdo fica na frente do fundo */
-      background: transparent;
-    }
-
-    /* Caixa principal */
-    .container {
-      background: rgba(255, 255, 255, 0.1); /* leve fundo transparente */
-      backdrop-filter: blur(10px); /* vidro fosco na caixa */
-      border-radius: 15px;
-      padding: 30px;
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
-      box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
-      position: relative;
-      transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
-    }
-
-    .hidden {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-
-    .server-icon {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      margin-bottom: 15px;
-      object-fit: cover;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 12px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 6px;
+      justify-content: center;
       overflow: hidden;
-      margin-top: 10px;
-      transition: opacity 0.5s ease-in-out;
+      user-select: none;
+      cursor: default;
+      transition: background-color 0.3s ease;
     }
-
-    .progress {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(to right, #00ffcc, #00ff88);
-      transition: width 0.5s ease-in-out;
+    body.dragging-bg {
+      background-color: #0d0d0d; /* deixa o fundo mais escuro quando arrasta */
     }
-
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 56rem;
+      margin: 0 auto;
+      padding: 4rem 1rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      letter-spacing: -0.025em;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    @media (min-width: 768px) {
+      h1 { font-size: 4.5rem; }
+    }
+    p {
+      color: #a3a3a3;
+      font-size: 1.25rem;
+      margin-bottom: 3rem;
+      max-width: 42rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (min-width: 768px) {
+      p { font-size: 1.5rem; }
+    }
     .button {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
+      gap: 0.5rem;
+      background-color: white;
+      color: #171717;
+      padding: 1rem 2rem;
+      border-radius: 9999px;
+      font-weight: 500;
       text-decoration: none;
-      transition: background 0.3s ease-in-out;
-      cursor: pointer;
-      border: none;
-      font-size: 16px;
-      margin-top: 15px;
-      opacity: 0; /* começa escondido */
+      transition: all 0.3s ease;
+      box-shadow: 0 0 0 rgba(255, 255, 255, 0);
     }
-
-    .button.show {
-      opacity: 1; /* aparece quando pronto */
-    }
-
     .button:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background-color: #f5f5f5;
+      transform: translateY(-4px);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
     }
-
-    footer {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #bdbdbd;
-      font-size: 14px;
-      text-align: center;
-      z-index: 2;
-    }
-
-    .discord-link a {
-  font-size: 23px;       /* maior um pouco */
-  font-weight: bold;
-  color: black;          /* texto preto */
-  background: none;      /* tira o gradiente colorido */
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: unset;
-  animation: none;       /* para piscar */
-}
-
-
-    @keyframes piscar {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+    .button:active {
+      transform: translateY(-2px) scale(0.98);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
     }
   </style>
 </head>
 <body>
+  <canvas id="particles"></canvas>
 
-  <div class="background"></div> <!-- Fundo desfocado -->
-
-  <div class="container hidden" id="verificationContainer">
-    <img id="discordImage" class="server-icon" src="https://media.discordapp.net/attachments/1328003685430591569/1346597723830227105/Logo_Flash_store.png?ex=6836d99b&is=6835881b&hm=b9a505433b7c25363940064acbcbbc134fc4c19256acd3074eae816ef9e2e2a0&=&format=webp&quality=lossless&width=864&height=864" alt="Imagem do Discord" />
-    <h2 id="statusText">Verificando...</h2>
-    <p id="progressText">0%</p>
-    <div class="progress-bar" id="progressContainer">
-      <div class="progress" id="progressBar"></div>
-    </div>
-    <button class="button" id="discordButton" onclick="window.location.href='https://discord.gg/flashstore'">Volte ao Discord</button>
-  </div>
-
-  <footer>
-    <div class="discord-link">
-      <a href="" target="_blank">by @antiregras</a>
-    </div>
-  </footer>
+  <main>
+    <h1>
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      Verificação Concluída
+    </h1>
+    <p>
+      Você concedeu acesso ao aplicativo com sucesso. Agora pode voltar pro Discord.
+    </p>
+    <a href="https://discord.gg/flashstore" class="button" target="_blank" rel="noopener noreferrer">
+      Voltar ao Discord
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 16 16 12 12 8"></polyline>
+        <line x1="8" y1="12" x2="16" y2="12"></line>
+      </svg>
+    </a>
+  </main>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const container = document.getElementById("verificationContainer");
-      const progressBar = document.getElementById("progressBar");
-      const progressText = document.getElementById("progressText");
-      const progressContainer = document.getElementById("progressContainer");
-      const statusText = document.getElementById("statusText");
-      const discordButton = document.getElementById("discordButton");
+    const canvas = document.getElementById('particles')
+    const ctx = canvas.getContext('2d')
+    let width
+    let height
+    let particles = []
+    let draggingParticles = new Set()
 
-      let progress = 0;
+    function resize() {
+      width = window.innerWidth
+      height = window.innerHeight
+      canvas.width = width
+      canvas.height = height
+    }
+    window.addEventListener('resize', resize)
+    resize()
 
-      setTimeout(() => {
-        container.classList.remove("hidden");
-      }, 300);
+    function createParticles() {
+      particles = []
+      for(let i = 0; i < 150; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          baseRadius: Math.random() * 3 + 1,
+          radius: null,
+          dx: (Math.random() - 0.5) * 0.8,
+          dy: (Math.random() - 0.5) * 0.8,
+          color: 'rgba(255,255,255,1)',
+          opacity: Math.random() * 0.5 + 0.2,
+          pulse: Math.random() * 0.02 + 0.005,
+          isDragging: false,
+          enlarged: false
+        })
+      }
+      particles.forEach(p => p.radius = p.baseRadius)
+    }
 
-      const interval = setInterval(() => {
-        progress += 2;
-        progressBar.style.width = progress + "%";
-        progressText.textContent = progress + "%";
+    function drawLine(p1, p2) {
+      const dx = p1.x - p2.x
+      const dy = p1.y - p2.y
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      if(dist < 100) {
+        ctx.beginPath()
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+        ctx.lineWidth = 0.5
+        ctx.moveTo(p1.x, p1.y)
+        ctx.lineTo(p2.x, p2.y)
+        ctx.stroke()
+      }
+    }
 
-        if (progress >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            progressText.style.display = "none";
-            progressContainer.style.display = "none";
-            statusText.textContent = "Verificação Sucedida!";
-            discordButton.classList.add("show");
-          }, 500);
+    function drawParticle(p) {
+      ctx.beginPath()
+      ctx.fillStyle = p.color
+      ctx.globalAlpha = p.opacity
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.globalAlpha = 1
+    }
+
+    function updateParticles() {
+      particles.forEach(p => {
+        if(p.isDragging) return
+
+        p.x += p.dx
+        p.y += p.dy
+
+        if(p.x < p.radius) {
+          p.x = p.radius
+          p.dx *= -1
         }
-      }, 50);
-    });
-  </script>
+        if(p.x > width - p.radius) {
+          p.x = width - p.radius
+          p.dx *= -1
+        }
+        if(p.y < p.radius) {
+          p.y = p.radius
+          p.dy *= -1
+        }
+        if(p.y > height - p.radius) {
+          p.y = height - p.radius
+          p.dy *= -1
+        }
 
+        p.opacity += p.pulse
+        if(p.opacity > 0.7 || p.opacity < 0.2) p.pulse = -p.pulse
+
+        if(p.enlarged && !p.isDragging) {
+          p.radius -= 0.15
+          if(p.radius <= p.baseRadius) {
+            p.radius = p.baseRadius
+            p.enlarged = false
+          }
+        }
+      })
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height)
+      for(let i = 0; i < particles.length; i++) {
+        for(let j = i + 1; j < particles.length; j++) {
+          drawLine(particles[i], particles[j])
+        }
+      }
+      particles.forEach(drawParticle)
+    }
+
+    function animate() {
+      updateParticles()
+      draw()
+      requestAnimationFrame(animate)
+    }
+
+    canvas.addEventListener('mousedown', e => {
+      const rect = canvas.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const mouseY = e.clientY - rect.top
+
+      for(let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+        const dx = p.x - mouseX
+        const dy = p.y - mouseY
+        if(Math.sqrt(dx * dx + dy * dy) <= p.radius + 5) {
+          if(!p.isDragging) {
+            p.isDragging = true
+            p.enlarged = true
+            p.radius = p.baseRadius * 3
+            draggingParticles.add(p)
+            document.body.classList.add('dragging-bg')
+          }
+          break
+        }
+      }
+    })
+
+    window.addEventListener('mousemove', e => {
+      if(draggingParticles.size === 0) return
+      const rect = canvas.getBoundingClientRect()
+
+      draggingParticles.forEach(p => {
+        p.x = e.clientX - rect.left
+        p.y = e.clientY - rect.top
+      })
+    })
+
+    window.addEventListener('mouseup', e => {
+      if(draggingParticles.size === 0) return
+
+      draggingParticles.forEach(p => {
+        p.isDragging = false
+        p.enlarged = true
+      })
+      draggingParticles.clear()
+      document.body.classList.remove('dragging-bg')
+    })
+
+    createParticles()
+    animate()
+  </script>
 </body>
 </html>
